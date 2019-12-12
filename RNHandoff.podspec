@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/IzaakSultan/react-native-handoff"
   s.license      = "MIT"
   s.platform     = :ios, "9.0"
-
+  s.author       = { "Izaak Sultan" => "hello@izaaksultan.com" }
   s.source       = { :git => "https://github.com/IzaakSultan/react-native-handoff.git" }
   s.source_files  = "ios/**/*.{h,m}"
 
