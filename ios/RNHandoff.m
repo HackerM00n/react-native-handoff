@@ -4,40 +4,35 @@
 
 RCT_EXPORT_MODULE()
 
-NSMutableArray *activities = nil;
-
-- (NSMutableArray *)activityList
-{
-    if (activities == nil) activities = [NSMutableArray array];
-    return activities;
-}
+// Keep a reference to the current user activity
+NSUserActivity *currentActivity = nil;
 
 RCT_EXPORT_METHOD(becomeCurrent:(NSNumber * _Nonnull)activityId type:(NSString *)type title:(NSString *)title url:(NSString *)url)
 {
+    // Invalidate the current activity if it exists
+    if (currentActivity) {
+        [currentActivity invalidate];
+        currentActivity = nil;
+    }
+
+    // Create and become the new activity
     NSUserActivity* activity = [[NSUserActivity alloc] initWithActivityType:type];
     activity.title = title;
     activity.webpageURL = [[NSURL alloc] initWithString:url];
     
     [activity becomeCurrent];
     
-    [[self activityList] addObject:@{ @"id": activityId, @"activity": activity }];
+    // Keep a reference to the new current activity
+    currentActivity = activity;
 }
 
-RCT_EXPORT_METHOD(invalidate:(NSNumber * _Nonnull)i)
+RCT_EXPORT_METHOD(invalidate:(NSNumber * _Nonnull)activityId)
 {
-    int ix = [[self activityList] indexOfObjectPassingTest:^(id obj, NSUInteger idx, BOOL *stop) {
-        if ([[obj objectForKey:@"id"] intValue] == [i intValue]) {
-            *stop = YES;
-            return YES;
-        } else {
-            return NO;
-        }
-        
-    }];
-    
-    [[[[self activityList] objectAtIndex:ix] objectForKey:@"activity"] invalidate];
-
-    [[self activityList] removeObjectAtIndex:ix];
+    // Invalidate the current activity if it exists
+    if (currentActivity) {
+        [currentActivity invalidate];
+        currentActivity = nil;
+    }
 }
 
 @end

@@ -1,28 +1,23 @@
-import { Component } from 'react';
-import { NativeModules } from 'react-native'
+import React, { useEffect } from "react";
+import { NativeModules } from "react-native";
 
 const { RNHandoff } = NativeModules;
 
-let id = 0;
-
-export default class Handoff extends Component {
-    id = -1;
-
-    componentWillMount() {
-        const { type, title, url } = this.props;
-
-        this.id = ++id;
-
-        RNHandoff.becomeCurrent(this.id, type, title, url);
-    }
-
-    componentWillUnmount() {
-        if (this.id !== -1) {
-            RNHandoff.invalidate(this.id);
-        }
-    }
-
-    render() {
-        return null;
-    }
+function generateRandomId() {
+  return Math.floor(Math.random() * 9000000000) + 1000000000;
 }
+
+function Handoff({ type, title, url }) {
+  useEffect(() => {
+    const handoffId = generateRandomId();
+    RNHandoff.becomeCurrent(handoffId, type, title, url);
+
+    return () => {
+      RNHandoff.invalidate(handoffId);
+    };
+  }, [type, title, url]);
+
+  return null;
+}
+
+export default Handoff;
